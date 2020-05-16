@@ -1,0 +1,25 @@
+Isfar\CommissionTask\Entity\Transaction:
+    properties:
+        on:
+            - NotBlank: ~
+        type:
+            - Choice:
+                choices: !php/const Isfar\CommissionTask\Transaction\Transaction::TYPES
+        money:
+            - Valid: ~
+
+Evp\Component\Money\Money:
+    properties:
+        amount:
+            - Type: string
+        currency:
+            - Choice:
+                choices: !php/const Isfar\CommissionTask\Money\Currency::ALL
+
+Isfar\CommissionTask\Entity\User:
+    properties:
+        id:
+            - Type: string
+        type:
+            - Choice:
+                choices: !php/const Isfar\CommissionTask\Entity\User::TYPES

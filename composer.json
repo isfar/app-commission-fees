@@ -1,0 +1,48 @@
+{
+    "name": "isfar/commission-task-skeleton",
+    "description": "Skeleton for Paysera recruitment task",
+    "keywords": [],
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Isfar\\CommissionTask\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Isfar\\CommissionTask\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": ">=7.0",
+        "ext-bcmath": "*",
+        "doctrine/annotations": "^1.8",
+        "evp/money": "^2.2",
+        "symfony/config": "^5.0",
+        "symfony/dependency-injection": "^5.0",
+        "symfony/validator": "^5.0",
+        "symfony/yaml": "^5.0"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "2.16",
+        "paysera/lib-php-cs-fixer-config": "^2.2",
+        "phpunit/phpunit": "^6.5",
+        "symfony/var-dumper": "^5.0"
+    },
+    "config": {
+        "sort-packages": true,
+        "bin-dir": "bin"
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "Paysera\\PhpCsFixerConfig\\Composer\\PhpCsFixerConfigProvider::copyPhpCs"
+        ],
+        "post-update-cmd": [
+            "Paysera\\PhpCsFixerConfig\\Composer\\PhpCsFixerConfigProvider::copyPhpCs"
+        ],
+        "phpunit": "phpunit",
+        "fix-cs": "php-cs-fixer fix",
+        "test-cs": "php-cs-fixer fix --dry-run -v",
+        "test": ["@phpunit", "@test-cs"]
+    }
+}

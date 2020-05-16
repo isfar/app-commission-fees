@@ -1,0 +1,41 @@
+{
+    "1111": {
+        "rate": "0.5",
+        "limit": {
+            "type": "max",
+            "money": {
+                "amount": "10"
+            }
+        },
+        "exempt": {
+            "count": 10,
+            "money": {
+                "amount": "1000"
+            }
+        }
+    },
+    "111": {
+        "rate": "0",
+        "limit": {
+            "type": "min",
+            "money": {
+                "amount": "0.5"
+            }
+        }
+    },
+    "11": {
+        "rate": "3",
+        "limit": {
+            "type": "max",
+            "money": {
+                "amount": "13"
+            }
+        },
+        "exempt": {
+            "count": 2,
+            "money": {
+                "amount": "200"
+            }
+        }
+    }
+}

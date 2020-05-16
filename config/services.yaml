@@ -1,0 +1,133 @@
+parameters:
+    application.exit_codes:
+        on: 2
+        user.id: 2
+        user.type: 2 
+        type: 2
+        money.amount: 2
+        money.currency: 1
+    
+    commission.rule.cash_in:
+        rate: '0.03'
+        limit:
+            type: max
+            money:
+                amount: '5'
+                currency: EUR
+
+    commission.rules:
+        user:
+            file_path: 'data/user-rules.json'
+        default:
+            cash_in:
+                legal: '%commission.rule.cash_in%'
+                natural: '%commission.rule.cash_in%'
+            cash_out:
+                legal:
+                    rate: '0.3'
+                    limit:
+                        type: min
+                        money:
+                            amount: '0.5'
+                            currency: EUR
+                natural:
+                    rate: '0.3'
+                    exempt:
+                        count: 3
+                        money:
+                            amount: '1000'
+                            currency: EUR
+
+    currency.converter.config:
+        USD: '1.1491'
+        JPY: '129.53'
+        EUR: '1.00'
+    
+    validator.config_yaml_path: 'config/validator/validation.yaml'
+
+services:
+    application:
+        class: Isfar\CommissionTask\Application\Application
+        arguments:
+            - '@commission.calculator'
+            - '@currency.converter.default'
+            - '@repository.transaction_repository'
+            - '@transaction.transaction_file_reader'
+            - '@validator.default'
+            - '%application.exit_codes%'
+        public: true
+    
+    commission.rule_manager:
+        class: Isfar\CommissionTask\Commission\Rule\RuleManager
+        arguments:
+            - '%commission.rules%'
+            - '@commission.rule_factory'
+            - '@file.file_manager'
+
+    commission.rule_factory:
+        class: Isfar\CommissionTask\Commission\Rule\RuleFactory
+    
+    commission.calculator:
+        class: Isfar\CommissionTask\Commission\Calculator
+        arguments:
+            - '@repository.transaction_repository'
+            - '@commission.rule_manager'
+    
+    validator.default.factory:
+        class: Isfar\CommissionTask\Validator\ValidatorFactory
+        arguments:
+            - '%validator.config_yaml_path%'
+
+    validator.default:
+        class: Symfony\Component\Validator\Validator\ValidatorInterface
+        factory: ['@validator.default.factory', 'create']
+
+    transaction.factory:
+        class: Isfar\CommissionTask\Transaction\TransactionFactory
+    
+    transaction.transaction_mapper:
+        class: Isfar\CommissionTask\Transaction\TransactionMapper
+        
+
+    transaction.mapper.json_mapper:
+        class: Isfar\CommissionTask\Transaction\Mapper\JsonMapper
+        tags:
+            - { name: 'transaction.mapper', type: 'json' }
+
+    transaction.mapper.csv_mapper:
+        class: Isfar\CommissionTask\Transaction\Mapper\CsvMapper
+        tags:
+            - { name: 'transaction.mapper', type: 'csv' }
+    
+    file.file_manager:
+        class: Isfar\CommissionTask\File\FileManager
+
+    file.reader.json_reader:
+        class: Isfar\CommissionTask\File\JsonReader
+        tags:
+            - { name: 'file.reader', type: 'json' }
+
+    file.reader.csv_reader:
+        class: Isfar\CommissionTask\File\CsvReader
+        tags:
+            - { name: 'file.reader', type: 'csv' }
+
+    transaction.transaction_file_reader:
+        class: Isfar\CommissionTask\Transaction\TransactionFileImporter
+        arguments:
+            - '@file.file_manager'
+            - '@transaction.transaction_mapper'
+
+
+    repository.transaction_repository:
+        class: Isfar\CommissionTask\Repository\TransactionRepository
+        arguments:
+            - '@storage.default_storage'
+
+    storage.default_storage:
+        class: Isfar\CommissionTask\Storage\ArrayStorage
+
+    currency.converter.default:
+        class: Isfar\CommissionTask\Money\CurrencyConverter
+        arguments:
+            - '%currency.converter.config%'
